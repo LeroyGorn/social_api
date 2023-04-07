@@ -1,6 +1,6 @@
+from auth_user.models import CustomUser
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from apps.auth_user.models import CustomUser
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -9,12 +9,14 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = [
+            'id',
             'email',
             'password',
             'check_password',
             'first_name',
             'last_name',
         ]
+        read_only_fields = ['id']
         extra_kwargs = {
             'password': {'write_only': True},
         }
@@ -29,7 +31,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         if attrs['password'] != attrs['check_password']:
-            raise serializers.ValidationError({"password": "Password fields didn't match."})
+            raise serializers.ValidationError({'password': 'Password fields did not match.'})
         return attrs
 
 
@@ -39,6 +41,7 @@ class CustomObtainTokenSerializer(TokenObtainPairSerializer):
         refresh = self.get_token(self.user)
         data['refresh'] = str(refresh)
         data['access'] = str(refresh.access_token)
+        data['id'] = self.user.id
         data['email'] = self.user.email
         data['first_name'] = self.user.first_name
         data['last_name'] = self.user.last_name
@@ -47,6 +50,7 @@ class CustomObtainTokenSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super(CustomObtainTokenSerializer, cls).get_token(user)
+        token['id'] = user.id
         token['email'] = user.email
         token['first_name'] = user.first_name
         token['last_name'] = user.last_name
@@ -61,7 +65,7 @@ class UserAnalyticsSerializer(serializers.ModelSerializer):
         return obj.last_session.strftime('%Y-%m-%d %H:%M:%S') if obj.last_session else 'Never'
 
     def get_last_activity(self, obj):
-        return obj.last_activity.strftime('%Y-%m-%d %H:%M:%S')
+        return obj.last_activity.strftime('%Y-%m-%d %H:%M:%S') if obj.last_activity else 'Never'
 
     class Meta:
         model = CustomUser

@@ -1,6 +1,5 @@
+from posts.models import UserPost, Like
 from rest_framework import serializers
-
-from apps.posts.models import UserPost, Like
 
 
 class UserPostListSerializer(serializers.ModelSerializer):

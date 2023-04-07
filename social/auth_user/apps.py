@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class PostUserConfig(AppConfig):
+class AuthUserConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'apps.posts'
+    name = 'auth_user'

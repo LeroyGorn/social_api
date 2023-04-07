@@ -1,7 +1,4 @@
-import json
 from django.utils import timezone
-
-from apps.auth_user.models import CustomUser
 
 
 class UpdateLastRequestMiddleware:

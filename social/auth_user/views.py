@@ -1,15 +1,13 @@
-from django.utils import timezone
+from auth_user.models import CustomUser
+from auth_user.serializers import UserSerializer, CustomObtainTokenSerializer, UserAnalyticsSerializer
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from rest_framework import generics, status
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework.permissions import AllowAny, IsAuthenticated
-
-from apps.auth_user.serializers import UserSerializer, CustomObtainTokenSerializer, UserAnalyticsSerializer
-
-from apps.auth_user.models import CustomUser
 
 
 class UserCreateView(generics.CreateAPIView):
@@ -43,19 +41,16 @@ class UserLogoutView(APIView):
             refresh_token = request.data['refresh']
             refresh_token = RefreshToken(refresh_token)
             refresh_token.blacklist()
-            return Response("Successful Logout", status=status.HTTP_205_RESET_CONTENT)
+            return Response('Successful Logout', status=status.HTTP_205_RESET_CONTENT)
         except Exception as exc:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-class UserAnalyticsView(generics.ListAPIView):
+class UserAnalyticsView(generics.RetrieveAPIView):
     permission_classes = (
         IsAuthenticated,
     )
     serializer_class = UserAnalyticsSerializer
 
-    def get(self, *args, **kwargs):
-        user = get_object_or_404(CustomUser, id=self.kwargs.get('user_id'))
-        return Response(
-            UserAnalyticsSerializer(user).data
-        )
+    def get_object(self):
+        return get_object_or_404(CustomUser, id=self.kwargs.get('user_id'))

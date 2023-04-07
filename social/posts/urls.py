@@ -1,6 +1,6 @@
-from django.urls import path, include
+from django.urls import path
 
-from apps.posts.views import (
+from posts.views import (
     UserPostView,
     LikeAnalyticsView,
     PostListView,
